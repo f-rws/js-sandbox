@@ -131,3 +131,90 @@
                     };
                     const greetingProfile3 = greeting3.bind(profile3, "やあ、");
                     console.log(greetingProfile3()); // "やあ、ラムズデール"
+            /*
+            * 問題２: コールバック関数と`this`
+            * ・コールバック関数の中で`this`を参照すると問題となる場合がある。具体的にはメソッドの中で`Array.map()`メソッドのコールバック関数を扱う場合などに起きる。
+            * 　コールバック関数の`function(str) {}`にはベースオブジェクトは存在しないため`this`は`undefined`となる。
+            * ・対処法は３つある
+            * 　・`this`を一時変数に代入する
+            * 　・メソッド（`Array.map`メソッドなど）によっては`this`を渡せるようになっているので利用する。
+            * 　・ArrowFunction でコールバック関数を扱う。  */
+                const Prefixer1 = {
+                    prefix: "pre",
+                    prefixArray(strings) {
+                        return strings.map(function(str) {
+                            // コールバック関数における`this`は`undefined`となる(strict mode)
+                            return this.prefix + "-" + str;
+                        });
+                    }
+                };
+                // Prefixer1.prefixArray(["a", "b", "c"]); // Uncaught TypeError: Cannot read properties of undefined (reading 'prefix')
+
+                /*
+                * 対処法：`this`を一時変数に代入する  */
+                    const Prefixer2 = {
+                        prefix: "pre",
+                        prefixArray(strings) {
+                            const that = this; // `this`を変数に代入
+                            console.log(that) // `Prefixer2`
+                            return strings.map(function(str) {
+                                return that.prefix + "-" + str;
+                            });
+                        }
+                    };
+                    const prefixerStrings2 = Prefixer2.prefixArray(["a", "b", "c"]);
+                    console.log("prefixerStrings2", prefixerStrings2); // ['pre-a', 'pre-b', 'pre-c']
+                /*
+                * 対処法：メソッド（`Array.map`メソッドなど）によっては`this`を渡せるようになっているので利用する  */
+                    const Prefixer3 = {
+                        prefix: "pre",
+                        prefixArray(strings) {
+                            return strings.map(function(str) {
+                                return this.prefix + "-" + str;
+                            }, this); // `map`メソッドの第二引数に`this`を渡す
+                        }
+                    };
+                    const prefixerStrings3 = Prefixer3.prefixArray(["a", "b", "c"]);
+                    console.log("prefixerStrings3", prefixerStrings3); // ['pre-a', 'pre-b', 'pre-c']
+                /*
+                * 対処法：ArrowFunction でコールバック関数を扱う
+                * ・ArrowFunction で定義したコールバック関数は常に１つ外側のスコープの`this`を参照する  */
+                    const Prefixer4 = {
+                        prefix: "pre",
+                        prefixArray(strings) {
+                            return strings.map((str) => {
+                                // ArrowFunction 自体は`this`を持っていないため、外側の`prefixArray`メソッドが持つ`this`を参照する
+                                return this.prefix + "-" + str;
+                            });
+                        }
+                    };
+                    const prefixerStrings4 = Prefixer4.prefixArray(["a", "b", "c"]);
+                    console.log("prefixerStrings4", prefixerStrings4); // ['pre-a', 'pre-b', 'pre-c']
+    /*
+    * ArrowFunction と`this`
+    * ・ArrowFunction での`this`は定義時にどの値を参照するか決まる。
+    * ・ArrowFunction は`this`を暗黙的な引数として受け付けない。そのため、ArrowFunction 内で定義された`this`は外側の`this`を参照する。
+    * 　これは変数のスコープチェーンと同じ仕組みで`this`が無かった場合は外側のスコープへ探索しに行く。
+    * ・ユーザーは`this`という変数を定義できない。 */
+        /*
+        * メソッドとコールバック関数と ArrowFunction
+        * ・ArrowFunction における`this`は呼び出し方に影響されないため、コールバック関数がどのように呼ばれるかを考えなくて良い。  */
+            const Prefixer5 = {
+                prefix: "pre",
+                prefixArray(strings) {
+                    return strings.map((str) => {
+                        // ArrowFunction 自体は`this`を持っていないため、外側の`prefixArray`メソッドが持つ`this`を参照する
+                        return this.prefix + "-" + str;
+                    });
+                }
+            };
+            const prefixerStrings5 = Prefixer5.prefixArray(["a", "b", "c"]);
+            console.log("prefixerStrings5", prefixerStrings5); // ['pre-a', 'pre-b', 'pre-c']
+        /*
+        * ArrowFunction は`this`をbindできない
+        * ・ArrowFunction で定義した関数で`call`, `apply`, `bind`を使用しても引数に指定した`this`は無視される。  */
+            const arrowFn = () => {
+                return this;
+            };
+            console.log("arrowFn()", arrowFn()) // Window{...}
+            console.log("arrowFn.call('THIS'))", arrowFn.call("THIS")) // Window{...}
