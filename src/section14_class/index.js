@@ -218,35 +218,166 @@ console.log(MyClass.prototype.constructor)  // `class MyClass {...}`
             3. どこにも無い場合は`undefined`  */
 
 
+/*
+    継承
+    ・`extends`を用いることで継承したクラス定義ができる   */
+
+    /*
+        `super`
+         ・継承した子クラスで親クラスを参照できる。
+         ・`super()`は親クラスの`constructor`メソッドを呼び出している。  */
+    // 親クラス
+    class ParentA {
+        constructor(arg) {
+            console.log("ParentAクラスの constructor()", arg);
+        }
+    }
+    // 子クラス
+    class ChildA extends ParentA{
+        constructor(arg) {
+            // 親クラスの`constructor()`を呼び出している
+            super(arg);
+            console.log("ChildAクラスの constructor()", arg);
+        }
+    }
+    const childA = new ChildA("あーせなる")
+    // "ParentAクラスの constructor()", "あーせなる"
+    // "ChildAクラスの constructor()", "あーせなる"
+
+    /*
+        コンストラクタの処理順は親クラスから子クラスへ
+        ・子クラスのコンストラクタでは`this`を参照する前に必ず`super()`で親クラスのコンストラクタを呼び出さなければならない。呼び出さないと`ReferenceError`となる
+        ・子クラスのコンストラクタの処理順は親クラスのコンストラクタ -> 子クラスのコンストラクタとなる。  */
+    class ParentB {
+        constructor() {
+            this.name = "Parent";
+        }
+    }
+    class ChildB extends ParentB{
+        constructor() {
+            super();
+            console.log("代入前の`this.name`,", this.name)
+            this.name = "Child"
+            console.log("代入後の`this.name`,", this.name)
+        }
+    }
+    const childB = new ChildB()
+    // "代入前の`this.name`, Parent"
+    // "代入後の`this.name`, Child"
+
+    /*
+        クラスフィールドの継承
+        ・ クラスフィールドもコンストラクタと同様に親クラス -> 子クラスの順番で処理される。そのため、同じ命名がされていた場合、子クラスで定義された値が上書きされる
+        ・親クラスで Privateクラスフィールドで定義していた場合は子クラスからは参照されず、構文エラーとなる。 このように子クラスを含むクラスの外からアクセスを拒否する Private をJavaScriptの世界では hard private と呼ぶ。
+          Privateクラスフィールドは hard private となっている。  */
+    class ParentC {
+        name = "ParentCのクラスフィールド"
+    }
+    class ChildC extends ParentC{
+        name = "ChildCのクラスフィールド"
+    }
+    const childC= new ChildC();
+    console.log(childC.name);  // "ChildCのクラスフィールド"
+
+    // Privateクラスフィールド
+    class ParentD {
+        #parentName = "ParentDのPrivateクラスフィールド"
+    }
+    class ChildD extends ParentD{
+        display() {
+            // console.log(this.#parentName);  // Uncaught SyntaxError: Private field '#parentName' must be declared in an enclosing class
+        }
+    }
+    const childD= new ChildD();
+    childD.display();
+
+    /*
+        プロトタイプの継承
+        ・子クラスのインスタンスは親クラスのプロトタイプを継承しており、呼び出すことができる。
+        ・子クラスのインスタンスに定義されたプロパティとメソッドは以下の順序で探索される
+        　1. （`Child`クラスの）インスタンスオブジェクト自身
+        　2. （`Parent`クラスの）インスタンスオブジェクト自身
+        　3. `Child.prototype`の`[[Prototype]]`内
+        　4. `Parent.prototype`の`[[Prototype]]`内
+    */
+    class ParentE {
+        method() {
+            console.log("ParentE.prototype.method")
+        }
+    }
+    class ChildE extends ParentE{
+        // method定義なし
+    }
+    const childE= new ChildE();
+    childE.method()  // "ParentE.prototype.method"
+
+    /*
+        `super`プロパティ
+        ・子クラスから親クラスのプロトタイプメソッドを呼び出すには`super.プロパティ名`で呼び出せる。クラスの静的メソッドを呼び出すときも同じである。  */
+    class ParentF {
+        method() {
+            console.log("ParentF.prototype.method")
+        }
+    }
+    class ChildF extends ParentF{
+        method() {
+            console.log("ChildF.prototype.method");
+            // ParentF.method() を呼び出している
+            super.method();
+        }
+    }
+    const childF= new ChildF();
+    childF.method()
+    // "ChildF.prototype.method"
+    // "ParentF.prototype.method"
+
+    // 子クラスから親クラスの静的メソッドの呼び出し
+    class ParentG {
+        static method() {
+            console.log("ParentG.method")
+        }
+    }
+    class ChildG extends ParentG{
+        static method() {
+            console.log("ChildG.method");
+            // ParentG.method() を呼び出している
+            super.method();
+        }
+    }
+    ChildG.method();
+    // "ChildG.method"
+    // "ParentG.method"
+
+    /*
+        継承の判定
+        ・どのクラスを継承しているかは`instanceof`を使って判定できる。
+        ・子クラスのインスタンスは子クラスと親クラスを継承したオブジェクトであることを確認できる。  */
+    class ParentH {}
+    class ChildH extends ParentH{}
+    const parentH = new ParentH();
+    const childH = new ChildH();
+    // `parentH`は`ParentH`のみのインスタンスと確認できる
+    console.log(parentH instanceof ParentH);  // true
+    console.log(parentH instanceof ChildH);  // false
+    // `childH`は`ChildH`と`ParentH`のインスタンスと確認できる
+    console.log(childH instanceof ParentH);  // true
+    console.log(childH instanceof ChildH);  // true
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
+    ビルドインオブジェクトの継承
+    ・`class`構文を用いてビルドインオブジェクトである`Array`、`String`、`Object`、`Number`、`Error`、`Date`などを継承することができる。   */
+class MyArray extends Array {
+    get first() {
+        return this.at(0);
+    }
+    get last() {
+        return this.at(-1);
+    }
+}
+// Arrayを継承しているのでArray.fromも継承している
+// Array.fromはIterableなオブジェクトから配列インスタンスを作成する
+const array = MyArray.from([1, 2, 3, 4, 5]);
+console.log(array.length); // => 5
+console.log(array.first); // => 1
+console.log(array.last); // => 5
