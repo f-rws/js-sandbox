@@ -101,6 +101,25 @@ console.log("testClass", testClass.publicField) // 3
     console.log("counter4", counter4.count); // 1
 
 
+/*
+    Privateクラスフィールド
+    ・クラスの外からアクセス不可な値を`#`も用いることで定義できる。
+    ・クラスの外からアクセスしようとすると`SyntaxError`を吐く  */
+class PrivateLoader {
+    #loadedContent;
+    load() {
+        this.#loadedContent = "読み込んだコンテンツ内容";
+    };
+    display() {
+        return this.#loadedContent;
+    }
+}
+const privateLoader = new PrivateLoader();
+privateLoader.load();
+console.log(privateLoader.display()); // "読み込んだコンテンツ内容"
+// console.log(privateLoader.#loadedContent); // Uncaught SyntaxError
+
+
 
 
 
