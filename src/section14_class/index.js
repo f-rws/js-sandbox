@@ -141,13 +141,14 @@ const membersB = Members.of("ジェズスA", "ぶかよA", "サカA");
 console.log("membersA", membersA.numberOfMembers());  // 3
 console.log("membersB", membersB.numberOfMembers());  // 3
 
+
 /*
     静的クラスフィールド
     ・静的メソッドと同じようにインスタンス化せずに呼び出せるプロパティ。`static`をつけて定義する。
-    ・Private静的クラスフィールドと併用も可能  */
+    ・Privateクラスフィールドと併用も可能  */
 class Colors {
     static GREEN = "緑";
-    static #BLACK = "黒";
+    static #BLACK = "黒";  // Privateクラスフィールドと併用
     static callBlack() {
         return this.#BLACK;
     }
@@ -157,7 +158,64 @@ console.log("Colors.BLACK", Colors.BLACK)  // undefined
 console.log("Colors.callBlack()", Colors.callBlack())  // "緑"
 
 
+/*
+    プロトタイプに定義したメソッドとインスタンスに定義したメソッドの違い
+    ・プロトタイプメソッド（class構文のメソッド）の定義とクラスフィールドを使ったメソッド定義が存在する。
+    　・プロトタイプメソッドは"プロトタイプオブジェクト"という特殊なオブジェクトに定義される。
+    　・クラスフィールドを使ったメソッドはクラスのインスタンスに対してメソッドが定義される。
+    ・どちらのメソッドも定義はされている。そして、クラスのインスタンスオブジェクトに定義されたメソッドが優先される。  */
+class ConflictClass {
+    // クラスのインスタンスオブジェクトに`method`を定義
+    method = () => {
+        console.log("クラスのインスタンスオブジェクトのメソッド");
+    };
 
+    // プロトタイプメソッドとして`method`を定義
+    method() {
+        console.log("プロトタイプのメソッド");
+    }
+}
+const conflict = new ConflictClass();
+conflict.method()  // "クラスのインスタンスオブジェクトのメソッド"
+delete conflict.method
+conflict.method()  // "プロトタイプのメソッド"
+/*
+     プロトタイプオブジェクト
+     ・プロトタイプオブジェクトはJavaScriptの関数オブジェクトから継承されるオブジェクトである。クラスも関数オブジェクトであるため、`prototype`オブジェクトが作成されている。
+     ・class構文のメソッドは`prototype`オブジェクトに定義される。また、`constructor`メソッドも`prototype`オブジェクトに定義されている。
+      `constructor`プロパティはクラス自身を参照している。  */
+class MyClass {
+    method() {
+        console.log("`prototype`オブジェクトに定義される")
+    }
+}
+console.log(MyClass.prototype)  // {constructor: ƒ, method: ƒ}
+console.log(MyClass.prototype.constructor)  // `class MyClass {...}`
+/*
+     プロトタイプチェーン
+     ・クラスインスタンスからプロトタイプメソッドを呼び出せるのはプロトタイプチェーンの仕組みによるもの。プロトタイプチェーンは以下の２つの処理から成り立つ。
+     　・インスタンス作成時に、インスタンスの`[[Prototype]]`内部のプロパティを保存する処理
+     　・インスタンスからプロパティやメソッドを参照するときに、`[[Prototype]]`内まで探索する処理  */
+    /*
+        インスタンス作成とプロトタイプチェーン
+        ・new 演算子によるインスタンス作成時、インスタンスにはクラスのプロトタイプオブジェクトが参照され、インスタンスの`[[Prototype]]`に保存される。
+        ・インスタンスから`[[Prototype]]`を参照するには`Object.getPrototypeOf`メソッドを用いる。  */
+    class MyClassA {
+        originalMethod() {
+            console.log("プロトタイプのメソッド");
+        }
+    }
+    const myClassA = new MyClassA();
+    const myClassAInstancePrototype = Object.getPrototypeOf(myClassA);
+    console.log(myClassAInstancePrototype)  // {constructor: ƒ, originalMethod: ƒ}
+    console.log(MyClassA.prototype)  // {constructor: ƒ, originalMethod: ƒ}
+    console.log("クラスのプロトオブジェクトとインスタンスのプロトオブジェクトが等しいかどうか", myClassAInstancePrototype === MyClassA.prototype)  // true
+    /*
+         プロパティの参照とプロトタイプチェーン
+         ・クラスインスタンスに定義されたプロパティとメソッドは以下の順序で探索される
+            1. インスタンスオブジェクト自身
+            2. インスタンスオブジェクトの`[[Prototype]]`内
+            3. どこにも無い場合は`undefined`  */
 
 
 
