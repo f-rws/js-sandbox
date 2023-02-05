@@ -120,6 +120,42 @@ console.log(privateLoader.display()); // "読み込んだコンテンツ内容"
 // console.log(privateLoader.#loadedContent); // Uncaught SyntaxError
 
 
+/*
+    静的メソッド
+    ・インスタンス化せずに呼び出せるメソッド。`static`をつけて定義する
+    ・静的メソッドでの`this`はクラスのインスタンスではなく、クラス自身を参照している。そのため、静的メソッドはクラスのインスタンスの作成処理やクラスに関係する処理を書くために利用される  */
+class Members {
+    constructor(members = []) {
+        this.members = members;
+    }
+    static of(...members) {
+        // return new Members(members);
+        return new this(members); // `this`はクラスを参照しているためこちらの記述でも同じ結果を得られる
+    };
+    numberOfMembers() {
+        return this.members.length;
+    }
+}
+const membersA = new Members(["ジェズス", "ぶかよ", "サカ"]);
+const membersB = Members.of("ジェズスA", "ぶかよA", "サカA");
+console.log("membersA", membersA.numberOfMembers());  // 3
+console.log("membersB", membersB.numberOfMembers());  // 3
+
+/*
+    静的クラスフィールド
+    ・静的メソッドと同じようにインスタンス化せずに呼び出せるプロパティ。`static`をつけて定義する。
+    ・Private静的クラスフィールドと併用も可能  */
+class Colors {
+    static GREEN = "緑";
+    static #BLACK = "黒";
+    static callBlack() {
+        return this.#BLACK;
+    }
+}
+console.log("Colors.GREEN", Colors.GREEN)  // "緑"
+console.log("Colors.BLACK", Colors.BLACK)  // undefined
+console.log("Colors.callBlack()", Colors.callBlack())  // "緑"
+
 
 
 
