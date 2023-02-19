@@ -48,7 +48,7 @@ console.log("この行は実行されます");
         `Promise`インスタンスの作成
         ・`new Promise`のコンストラクタには非同期処理を行う`executor`と呼ばれるコールバック関数を渡す。`executor`の引数には`resolve`と`reject`が存在する。
         　非同期処理行い成功時に`resolve()`を呼び、失敗時に`reject()`を呼び出す。
-        ・`Promise`インスタンスの`then`メソッドで成功、失敗時の関数を登録する。第１引数に`resolve`（成功）時に呼ばれるコールバック関数、第二引数に`reject`（失敗）時のコールバック関数を渡す。  */
+        ・`Promise`インスタンスの`then`メソッドで成功時、失敗時の関数を登録する。第１引数に`resolve`（成功）時に呼ばれるコールバック関数、第二引数に`reject`（失敗）時のコールバック関数を渡す。  */
     const promiseA = new Promise((resolve, reject) => {
         resolve("成功");
         reject("失敗");
@@ -61,3 +61,77 @@ console.log("この行は実行されます");
     };
     // `then`メソッドで成功時と失敗時に呼ばれるコールバック関数を登録
     promiseA.then(onFulfilled, onRejected);
+
+    /*
+         `Promise.prototype.then`と`Promise.prototype.catch`
+         ・`Promise`インスタンスの`catch`メソッドを利用して失敗時の関数を登録できる。また、`then`メソッドの第二引数を利用するより`catch`メソッドを利用する方が推奨されている。   */
+    const errorPromise = (message) => {
+        return new Promise((resolve, reject) => {
+            reject(new Error(message))
+        })
+    };
+    // `then`メソッドを利用
+    errorPromise("`then`メソッドを利用").then(undefined, (error) => {
+        console.log(error.message); // "`then`メソッドを利用"
+    });
+    // `catch`メソッドを利用
+    errorPromise("`catch`メソッドを利用").catch((error) => {
+        console.log(error.message); // "`catch`メソッドを利用"
+    });
+    // `then`メソッドと`catch`メソッドを利用
+    errorPromise("?")
+        .then(undefined, error => {
+            // `then`メソッドが優先される
+            console.log(`then: ${error.message}`)  // "then: ?"
+        })
+        .catch(error => {
+            // 処理されない
+            console.log(`catch: ${error.message}`)
+        });
+
+    /*
+        Promiseと例外
+        ・Promise はコンストラクタ内で例外が発生した（`throw`された）場合、失敗として扱われ`reject`メソッドが呼ばれた場合と同じ挙動をする。そのため、`Promise`インスタンスでは
+        　`then`メソッドの第二引数のコールバック関数、または`catch`メソッドのコールバック関数が呼び出される。  */
+    const throwPromise = () => {
+        return new Promise((resolve, reject) => {
+            // `throw`された時点で`reject`を呼ぶ
+            throw new Error("例外発生");
+        })
+    };
+    throwPromise().catch(error => {
+        console.log(error.message); // "例外発生"
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
