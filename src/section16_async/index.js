@@ -9,12 +9,12 @@
     　・JavaScriptで並列処理を行える非同期処理は WebWorkerAPI が提供している。  */
 
 
-/* 非同期処理と例外処理
+/*
+    非同期処理と例外処理
    ・同期処理では、`try...catch`を使用することで例外をキャッチできる。しかし、非同期処理の外から非同期処理内の例外処理を判定できない。そのため、非同期処理の中で例外
    　が発生したことを非同期処理の外に伝える必要がある。主な方法は以下の２パターンである。ちなみに、AsyncFunction は Promise の上に成り立っている。
    　・Promise
    　・AsyncFunction  */
-
 // 同期的な例外処理
 try {
     throw new Error("同期的なエラー");
@@ -36,3 +36,28 @@ setTimeout(() => {
 console.log("この行は実行されます");
 // "この行は実行されます"
 // "非同期的なエラー"
+
+
+/*
+    Promise
+    ・非同期処理の状態や結果を表現するビルドインオブジェクトである。
+    ・Promiseを用いた非同期処理は大きく２つの処理から成り立っている。
+    　・非同期処理をする部分：Promiseのインスタンスを返す。
+    　・非同期処理の結果を扱う部分：Promiseのインスタンスを受け取り成功した際の処理と失敗した際の処理をコールバック関数で登録する。  */
+    /*
+        `Promise`インスタンスの作成
+        ・`new Promise`のコンストラクタには非同期処理を行う`executor`と呼ばれるコールバック関数を渡す。`executor`の引数には`resolve`と`reject`が存在する。
+        　非同期処理行い成功時に`resolve()`を呼び、失敗時に`reject()`を呼び出す。
+        ・`Promise`インスタンスの`then`メソッドで成功、失敗時の関数を登録する。第１引数に`resolve`（成功）時に呼ばれるコールバック関数、第二引数に`reject`（失敗）時のコールバック関数を渡す。  */
+    const promiseA = new Promise((resolve, reject) => {
+        resolve("成功");
+        reject("失敗");
+    });
+    const onFulfilled = () => {
+        console.log("resolveされたときに呼ばれる");
+    };
+    const onRejected = () => {
+        console.log("rejectされたときに呼ばれる");
+    };
+    // `then`メソッドで成功時と失敗時に呼ばれるコールバック関数を登録
+    promiseA.then(onFulfilled, onRejected);
