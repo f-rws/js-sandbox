@@ -103,6 +103,52 @@ console.log("この行は実行されます");
         console.log(error.message); // "例外発生"
     });
 
+    /*
+        Promiseの状態
+        ・`Promise`インスタンスには、内部的に3つの状態が存在する。
+        　・Fulfilled...`resolve`（成功）した時の状態。この際`onFulfilled`が呼ばれる。
+        　・Rejected...`reject`（失敗）した時の状態。この際`onRejected`が呼ばれる。
+        　・Pending...Fulfilled でも Rejected でもない状態。`new Promise`の初期の状態。
+        ・`Promise`インスタンスは初期状態は Pending となり、一度でも Fulfilled または Rejected に変化すると、それ以降は状態を変化することない。
+        ・`Promise`インスタンスの状態が変化した際に、一度だけ呼ばれるコールバック関数を登録するのが`then`や`catch`メソッドになる。
+        ・`then`や`catch`メソッドは既に状態が変化済みの`Promise`インスタンスに対してもコールバック関数を後から登録できる。状態が変化済みの`Promise`インスタンスに登録した
+        　コールバック関数も非同期処理として呼ばれる  */
+        /*
+            `Promise.resolve`
+            ・Fulfilled の状態となった`Promise`インスタンスを生成する。
+            ・状態が変化済みになった`Promise`インスタンスに対して、`then`メソッドに登録するコールバック関数は常に非同期処理として実行される。  */
+        const fulfilledPromise1 = Promise.resolve();
+        // `Promise.resolve`メソッドの糖衣構文となる
+        const fulfilledPromise2 = new Promise((resolve) => {
+            resolve();
+        });
+        // 引数に`resolve`される値をセットできる
+        const fulfilledPromise3 = Promise.resolve("成功");
+        fulfilledPromise3.then(value => {
+            console.log(value)  // "成功"
+        });
+        // 常に非同期で処理される
+        const fulfilledPromise4 = Promise.resolve();
+        fulfilledPromise4.then(() => {
+            console.log("2. `fulfilledPromise4`のコールバック関数実行");
+        });
+        console.log("1. `fulfilledPromise4`の前に実行");
+        // "1. `fulfilledPromise4`の前に実行"
+        // "2. `fulfilledPromise4`のコールバック関数実行"
+
+        /*
+            `Promise.reject`
+            ・Rejected の状態となった`Promise`インスタンスを生成する。
+            ・状態が変化済みになった`Promise`インスタンスに対して、`catch`メソッドに登録するコールバック関数は常に非同期処理として実行される。  */
+        const rejectedPromise1 = Promise.reject(new Error("エラー"));
+        // `Promise.reject`メソッドの糖衣構文となる
+        const rejectedPromise2 = new Promise((_, reject) => {
+            reject(new Error("エラー"));
+        });
+
+        // ・`Promise.resolve`や`Promise.reject`は短くかけるため、テストコードなどで利用されることがある。
+        // ・`Promise.reject`は Promise チェーンにおいて、Promise の状態を操作するのに利用できる。
+
 
 
 
