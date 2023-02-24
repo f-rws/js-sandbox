@@ -149,6 +149,69 @@ console.log("この行は実行されます");
         // ・`Promise.resolve`や`Promise.reject`は短くかけるため、テストコードなどで利用されることがある。
         // ・`Promise.reject`は Promise チェーンにおいて、Promise の状態を操作するのに利用できる。
 
+    /*
+        Promiseチェーン
+        ・`Promise`インスタンスの`then`と`catch`メソッドは常に新たな`Promise`インスタンスを返している。これにより、`then`と`catch`メソッドの後に
+        　連続する`then`メソッドを登録できる。
+        ・`Promise`状態が Rejected になった場合、最も近い失敗時の処理が呼び出される。
+        ・`then`と`catch`メソッド内で例外が発生した時点で Rejected な`Promise`インスタンスを返す。
+        ・`catch`メソッドは Fulfilled な`Promise`インスタンスを返す。
+    */
+    // Rejected になった場合、最も近い`catch`メソッドが呼ばれる
+    const rejectedPromise3 = Promise.reject(new Error("rejectedPromise3: エラー"));
+    rejectedPromise3
+        .then(() => {
+            // 呼ばれない
+        })
+        .then(() => {
+            // 呼ばれない
+        })
+        .catch(error => {
+            console.log(error.message); // "rejectedPromise3: エラー"
+        });
+
+    // 例外が発生すると Rejected な`Promise`インスタンスを返す
+    Promise.resolve()
+        .then(() => {
+            throw new Error("例外が発生したため、最も近い`catch`メソッドに投げられる")
+        })
+        .then(() => {
+            // 呼ばれない
+        })
+        .catch(error => {
+            console.log(error.message); // "例外が発生したため、最も近い`catch`メソッドに投げられる"
+        });
+
+    // catch`メソッドは Fulfilled な`Promise`インスタンスを返す
+    const rejectedPromise4 = Promise.reject(new Error("rejectedPromise4: エラー"));
+    rejectedPromise4
+        .catch(error => {
+            console.log(error.message); // "rejectedPromise4: エラー"
+        })
+        .then(() => {
+            console.log("`catch`メソッドは fulfilled な`Promise`インスタンスを返す"); // "`catch`メソッドは fulfilled な`Promise`インスタンスを返す"
+        });
+    // 内部プロパティ`[[PromiseState]]`を確認
+    const rejectedPromise4AfterCatch = rejectedPromise4.catch(error => {});
+    console.log("rejectedPromise4AfterCatch", rejectedPromise4AfterCatch) // {[[PromiseState]]:  "fulfilled", ...}
+    // `catch`内で`throw`した場合
+    const rejectedPromise5 = Promise.reject(new Error("rejectedPromise5: エラー"));
+    rejectedPromise5
+        .catch(error => {
+            console.log(error.message); // "rejectedPromise5: エラー"
+            // `throw`を投げているため、再び`catch`に投げられる
+            throw new Error("'rejectedPromise5: エラー後'表示後に`catch`に投げられる");
+        })
+        .then(() => {
+            // 呼ばれない
+        })
+        .catch(error => {
+            console.log(error.message); // "'rejectedPromise5: エラー後'表示後に`catch`に投げられる"
+        });
+
+
+
+
 
 
 
