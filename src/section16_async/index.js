@@ -155,8 +155,7 @@ console.log("この行は実行されます");
         　連続する`then`メソッドを登録できる。
         ・`Promise`状態が Rejected になった場合、最も近い失敗時の処理が呼び出される。
         ・`then`と`catch`メソッド内で例外が発生した時点で Rejected な`Promise`インスタンスを返す。
-        ・`catch`メソッドは Fulfilled な`Promise`インスタンスを返す。
-    */
+        ・`catch`メソッドは Fulfilled な`Promise`インスタンスを返す。   */
     // Rejected になった場合、最も近い`catch`メソッドが呼ばれる
     const rejectedPromise3 = Promise.reject(new Error("rejectedPromise3: エラー"));
     rejectedPromise3
@@ -209,6 +208,41 @@ console.log("この行は実行されます");
             console.log(error.message); // "'rejectedPromise5: エラー後'表示後に`catch`に投げられる"
         });
 
+        /*
+            Promiseチェーンで値を返す
+            ・`then`や`catch`メソッドのコールバック関数は文字列、数値、オブジェクトなどの値を返せる。返した値は次の`then`メソッドの引数に渡される。  */
+        Promise.resolve(1)
+            .then(value => {
+                console.log(value); // 1
+                return value * 2;
+            })
+            .then(value => {
+                console.log(value); // 2
+            });
+        // `catch`メソッドの場合
+        Promise.reject(new Error("失敗"))
+            .catch(error => {
+                // 状態が Fulfilled の`Promise`インスタンスを返すため、値を引き継げる
+                return 3;
+            })
+            .then(value => {
+                console.log(value); // 3
+            });
+
+        /*
+            コールバック関数で`Promise`インスタンスを返す
+            ・通常`catch`メソッドのあとは`then`メソッドが呼ばれる。これはコールバック関数が任意の値を返すと、その値で`resolve`された`Promise`インスタンスを返すからである。
+            　しかし、明示的に`Promise`インスタンスを返す場合は例外である。  */
+        Promise.reject(new Error("test: コールバック関数で`Promise`インスタンスを返す"))
+            .catch(error => {
+                return Promise.reject(new Error(`${error.message} => 失敗`))
+            })
+            .then(() => {
+                // 呼ばれない
+            })
+            .catch(error => {
+                console.log(error.message); // "test: コールバック関数で`Promise`インスタンスを返す => 失敗"
+            });
 
 
 
