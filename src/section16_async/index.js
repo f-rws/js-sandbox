@@ -244,6 +244,68 @@ console.log("この行は実行されます");
                 console.log(error.message); // "test: コールバック関数で`Promise`インスタンスを返す => 失敗"
             });
 
+    /*
+        Promiseチェーンで逐次処理
+        ・`then`メソッドを繋いでいくことで連続する非同期処理に対応できる。    */
+        /*
+            `Promise.all`で複数のPromiseをまとめる
+            ・`Promise.all`メソッドを利用することで複数の非同期処理をまとめて処理できる。全て成功すれば Fulfilled 状態の`Promise`インスタンスを返し、
+           　　1つでも失敗すれば Rejected 状態の`Promise`インスタンスを返す。成功した場合は配列の`Promise`インスタンスを返す。  */
+        function dummyFetch(path) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if(path.startsWith("/resource")) {
+                        resolve({body: `Response body of ${path}`});
+                    } else {
+                        reject (new Error("NOT FOUND"));
+                    }
+                }, 1000);
+            })
+        }
+        // 成功時
+        const fulfilledPromiseAll = Promise.all([
+            dummyFetch("/resource/A"),
+            dummyFetch("/resource/B")
+        ]);
+        fulfilledPromiseAll
+            .then(res => {
+                console.log(res[0])  // {body: 'Response body of /resource/A'}
+                console.log(res[1])  // {body: 'Response body of /resource/B'}
+            });
+        // 失敗時
+        const rejectedPromiseAll = Promise.all([
+            dummyFetch("/resource/A"),
+            dummyFetch("/not_found/B")
+        ]);
+        rejectedPromiseAll
+            .then(() => {
+                // 呼ばれない
+            })
+            .catch(error => {
+                console.log(error.message);  // "NOT FOUND"
+            });
+
+        /*
+            `Promise.race`
+            ・複数の`Promise`インスタンスを受け取り、1つでも完了した（Settled 状態になった）時点で単数の`Promise`インスタンスを返す。
+            　返り値の`Promise`インスタンスの状態は Fulfilled にも Rejected にもなり得る。  */
+        function delay(timeoutMs) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(timeoutMs);
+                }, timeoutMs)
+            })
+        }
+        const fulfilledPromiseRace = Promise.race([
+            delay(1),
+            delay(32),
+            delay(64),
+        ]);
+        fulfilledPromiseRace.then(value => {
+            // 最も早く完了した`Promise`インスタンスが返ってくる
+            console.log(value); // 1
+        })
+
 
 
 
