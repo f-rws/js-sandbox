@@ -307,6 +307,41 @@ console.log("この行は実行されます");
         })
 
 
+/*
+    Async Function
+    ・必ず`Promise`インスタンスを返す。  */
+// doAsyncA関数は`Promise`インスタンスを返している
+async function doAsyncA() {
+    return "doAsyncA: 値";
+}
+doAsyncA().then(value => {
+    console.log(value); // "doAsyncA: 値"
+});
+// 上記の AsyncFunction は以下と同等である
+function doAsyncB() {
+    return Promise.resolve("doAsyncB: 値");
+}
+doAsyncB().then(value => {
+    console.log(value); // "doAsyncB: 値"
+});
+
+/*
+    Async Function の定義
+    ・以下のパターンが存在する
+    　・関数宣言
+    　・functionキーワードを用いた関数式
+    　・Arrow Function
+    　・メソッド  */
+// 関数宣言
+async function fn1() {}
+// functionキーワードを用いた関数式
+const fn2 = async function fn2() {};
+// Arrow Function
+const fn2 = async () => {};
+// メソッド
+const obj = {
+    async method() {}
+};
 
 
 
