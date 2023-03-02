@@ -346,7 +346,7 @@ const obj = {
 /*
     Async Function は Promise を返す
     ・Async Function は必ず`Promise`インスタンスを返すが、具体的に次の3つがある。
-    　1. 値を`return`した場合、Fulfilled な`Promise`インスタンスを返す。
+    　1. 値を`return`した場合、Fulfilled な`Promise`インスタンスを返す。何も`return`していない場合は`undefined`を返したのと同じ扱いになる。
     　2. 例外が発生した場合、そのエラーを持つ Rejected な`Promise`インスタンスを返す。
     　3. Promise を`return`する場合、そのまま`Promise`インスタンスを返す。  */
 // 1. Fulfilled な`Promise`インスタンスを返す場合
@@ -371,6 +371,56 @@ promiseFn().then(value => {
     console.log(value); // "`Promise`インスタンスを返している"
 });
 
+/*
+    `await`式
+    ・`await`式は以下の個所で使用可能である。
+    　・Async Function関数の直下
+    　・ECMAScriptモジュールの直下
+    ・`await`式は右辺の`Promise`インスタンスが Fulfilled または Rejected になり完了するまで処理を待ってくれる。
+    　・Fulfilled の場合、resolve された値を返す。
+    　・Rejected の場合、その場でエラーを`throw`する。結果として Async Functionは Rejected な`Promise`インスタンスを返す。  */
+// Fulfilled の場合
+async function asyncResolveA() {
+    const value = await Promise.resolve("asyncResolveA");
+    console.log(value); // "asyncResolveA"
+}
+asyncResolveA();
+// 上記と同じ意味になる
+async function asyncResolveB() {
+    return Promise.resolve("asyncResolveB").then(value => {
+        console.log(value); // "asyncResolveB"
+    });
+}
+asyncResolveB();
+
+// Rejected の場合
+async function asyncRejectA() {
+    // エラーが発生したため、`throw`が投げられる
+    const value = await Promise.reject(new Error("asyncRejectA()でエラー発生"));
+    // 例外が発生したため、この処理は実行されない
+}
+asyncRejectA().catch(error => {
+    console.log(error.message); // "asyncRejectA()でエラー発生"
+});
+// `await`式がエラー時に`throw`を投げるということは`try...catch`構文を使用し、`asyncRejectA()`内でエラーをキャッチすることができる
+async function asyncRejectB() {
+    try {
+        // エラーが発生したため、`throw`が投げられる
+        const value = await Promise.reject(new Error("asyncRejectB()でエラー発生"));
+        // 例外が発生したため、この処理は実行されない
+    }
+    catch (error) {
+        console.log(error.message); // "asyncRejectB()でエラー発生"
+    }
+}
+asyncRejectB()
+    .then(value => {
+        // `asyncRejectB`はFulfilled な`Promise`インスタンスを返してる
+        console.log(value); // undefined
+    })
+    .catch(error => {
+        // 既に`asyncRejectB`内でエラーがキャッチされているため、こちらの処理は実行されない
+    });
 
 
 
