@@ -337,11 +337,39 @@ async function fn1() {}
 // functionキーワードを用いた関数式
 const fn2 = async function fn2() {};
 // Arrow Function
-const fn2 = async () => {};
+const fn3 = async () => {};
 // メソッド
 const obj = {
     async method() {}
 };
+
+/*
+    Async Function は Promise を返す
+    ・Async Function は必ず`Promise`インスタンスを返すが、具体的に次の3つがある。
+    　1. 値を`return`した場合、Fulfilled な`Promise`インスタンスを返す。
+    　2. 例外が発生した場合、そのエラーを持つ Rejected な`Promise`インスタンスを返す。
+    　3. Promise を`return`する場合、そのまま`Promise`インスタンスを返す。  */
+// 1. Fulfilled な`Promise`インスタンスを返す場合
+async function resolveFn() {
+    return "Fulfilled";
+}
+resolveFn().then(value => {
+    console.log(value); // "Fulfilled"
+});
+// 2. Rejected な`Promise`インスタンスを返す場合
+async function rejectedFn() {
+    throw new Error("Rejected")
+}
+rejectedFn().catch(error => {
+    console.log(error.message); // "Rejected"
+});
+// 3. Promise をそのまま`return`する場合
+async function promiseFn() {
+    return Promise.resolve("`Promise`インスタンスを返している")
+}
+promiseFn().then(value => {
+    console.log(value); // "`Promise`インスタンスを返している"
+});
 
 
 
