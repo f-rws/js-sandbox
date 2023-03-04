@@ -422,6 +422,39 @@ asyncRejectB()
         // 既に`asyncRejectB`内でエラーがキャッチされているため、こちらの処理は実行されない
     });
 
+/*
+    AsyncFunction と組み合わせ  */
+    /*
+        PromiseAPI と AsyncFunction の組み合わせ
+        ・複数の非同期処理を同時に取得したい場合は`Promise.all`メソッドを使用する   */
+    function dummyFetch(path) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if(path.startsWith("/resource")) {
+                    resolve({ body: `Response body of ${path}` });
+                }
+                else {
+                    reject(new Error("NOT FOUND"));
+                }
+            }, 1000 * Math.random());
+        })
+    }
+    async function fetchAllResources(resources) {
+        // リクエストの配列を生成
+        const promises = resources.map(resource => dummyFetch(resource));
+        // レスポンスは`Array`型である
+        const res = await Promise.all(promises);
+        return res.map(res => res.body);
+    }
+
+    const resources = [
+        "/resource/A",
+        "/resource/B"
+    ];
+    fetchAllResources(resources).then(results => {
+        console.log(results) // ['Response body of /resource/A', 'Response body of /resource/B']
+    });
+
 
 
 
