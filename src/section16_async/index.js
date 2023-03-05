@@ -455,6 +455,37 @@ asyncRejectB()
         console.log(results) // ['Response body of /resource/A', 'Response body of /resource/B']
     });
 
+    /*
+        `await`式は AsyncFunction の直下のみで利用可能
+        ・`Array`の組み込み関数（`map`や`forEach`）などのコールバック関数で使用する場合は気をつける必要がある。  */
+    function dummyFetchA(path) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if(path.startsWith("/resource")) {
+                    resolve({ body: `Response body of ${path}` });
+                }
+                else {
+                    reject(new Error("NOT FOUND"));
+                }
+            }, 1000 * Math.random());
+        })
+    }
+    async function fetchAllResourcesA(resources) {
+        const results = [];
+        resources.forEach(async resource => {
+            const res = await dummyFetchA(resource);
+            results.push(res.body);
+        });
+        // `dummyFetch()`を待たずに`return`する
+        return results;
+    }
+    const resourcesA = [
+        "/resource/A",
+        "/resource/B"
+    ];
+    fetchAllResourcesA(resourcesA).then(results => {
+        console.log(results) // []
+    });
 
 
 
