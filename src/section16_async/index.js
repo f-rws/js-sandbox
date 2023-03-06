@@ -487,33 +487,16 @@ asyncRejectB()
         console.log(results) // []
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /*
+         Module直下での`await`式
+         ・JavaScriptには実行コンテキストが"Script"と"Module"があり、"Module"ではトップレベルで`await`式が可能である。（`./module.js`を参照）
+         　・今までは即時関数を使用していた   */
+    // `await`を使用するために即時関数を定義している
+    (async function() {
+        console.log("即時関数実行開始");
+        const startTime = Date.now();
+        // `await`を使用
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const diff = Date.now() - startTime;
+        console.log(`即時関数実行終了：${diff}ms経過しました`); // "実行終了：2009ms経過しました"
+    })();
