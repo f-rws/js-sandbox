@@ -75,3 +75,52 @@ console.log(map1.size) // 2
         result3.push(`${key}: ${value}`);
     }
     console.log(result3) // `['key1: value1', 'key2: value2']`
+
+    /*
+        マップとしてのObjectとMap
+        ・`Object`の場合
+        　・`prototype`から継承されたプロパティ名によって意図しないマッピングを生じる危険性がある（`constructor`など）。
+        　　ただし、`prototype`を継承しない`Object.create(null)`を使用して解消可能。
+          ・キー名に使えるのは`string`と`Symbol`のみ
+        ・`Map`の利点
+        　・マップのサイズが簡単にわかる
+        　・マップが持つ要素を簡単に列挙できる
+        　・オブジェクトをキーにすると参照ごとに違うマッピングができる   */
+    // ショッピングカートを表現するクラス
+    class ShoppingCart {
+        constructor() {
+            // 商品とその数を持つマップ
+            this.items = new Map();
+        }
+        // カートに商品を追加する
+        addItem(item) {
+            // `item`がない場合は`undefined`を返すため、Nullish coalescing演算子(`??`)を使いデフォルト値として`0`を設定する
+            const count = this.items.get(item) ?? 0;
+            this.items.set(item, count + 1);
+            console.log(this.items)
+        }
+        // カート内の合計金額を返す
+        getTotalPrice() {
+            return Array.from(this.items).reduce((total, [item, count]) => {
+                return total + item.price * count;
+            }, 0);
+        }
+        // カートの中身を文字列にして返す
+        toString() {
+            return Array.from(this.items).map(([item, count]) => {
+                return `${item.name}:${count}`;
+            }).join(",");
+        }
+    }
+    const shoppingCart = new ShoppingCart();
+    // 商品一覧
+    const shopItems = [
+        { name: "みかん", price: 100 },
+        { name: "リンゴ", price: 200 },
+    ];
+
+    shoppingCart.addItem(shopItems[0]);
+    shoppingCart.addItem(shopItems[0]);
+    shoppingCart.addItem(shopItems[1]);
+    console.log(shoppingCart.getTotalPrice()) // 400
+    console.log(shoppingCart.toString()) // "みかん:2,リンゴ:1"
