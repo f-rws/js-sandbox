@@ -124,3 +124,34 @@ console.log(map1.size) // 2
     shoppingCart.addItem(shopItems[1]);
     console.log(shoppingCart.getTotalPrice()) // 400
     console.log(shoppingCart.toString()) // "みかん:2,リンゴ:1"
+
+    /*
+        キーの等価性とNaN
+        ・マップがキーを既に持っているかは基本的に`===`演算子を使用する。
+        ・例外として`NaN`のみは常に`true`と判定される。この挙動はSame-value-zeroアルゴリズムと呼ばれる。  */
+    // `NaN`同士の厳密等価は`false`になる
+    console.log(NaN === NaN) // false
+    const map7 = new Map();
+    map7.set(NaN, "value");
+    // マップでの比較では等しく判定される
+    console.log(map7.has(NaN)); // true
+    // 追加しようとしても等しいものと判定され、sizeは増えない
+    map7.set(NaN, "value");
+    console.log(map7.size); // 1
+
+    // キーが`object`の場合、常に不等価のため新たにセットされる
+    const map8 = new Map();
+    const obj1 = {key: "value"};
+    const obj2 = {key: "value"};
+    console.log(obj1 === obj2); // false
+    map8.set(obj1, "value");
+    map8.set(obj2, "value");
+    console.log("map8", map8.size); // "map8" 2
+    // キーが`JSON.stringify(object)`の場合、プリミティブな文字列に変換し等価として判定されるため新たにセットされることはない。
+    const map9 = new Map();
+    const strObj1 = JSON.stringify({key: "value"});
+    const strObj2 = JSON.stringify({key: "value"});
+    console.log(strObj1 === strObj2); // true
+    map9.set(strObj1, "value");
+    map9.set(strObj2, "value");
+    console.log("map9", map9.size); // "map9" 1
