@@ -155,3 +155,80 @@ console.log(map1.size) // 2
     map9.set(strObj1, "value");
     map9.set(strObj2, "value");
     console.log("map9", map9.size); // "map9" 1
+
+
+/*
+    Set
+    ・重複を無くしたコレクションを生成する  */
+const set = new Set();
+
+    /*
+        値の追加と取り出し
+        ・`add`メソッドで値を追加する
+        ・`has`メソッドで値を持っているか
+        ・`delete`メソッドで値を削除する
+        ・`clear`メソッドで全ての値を削除する  */
+    // add
+    const set1 = new Set();
+    set1.add(1);
+    set1.add(2);
+    console.log(set1.size) // 2
+    // `1`を追加しても重複をなくすためコレクションに変化はない
+    set1.add(1);
+    console.log(set1.size) // 2
+
+    // has
+    const set2 = new Set();
+    set2.add(1);
+    console.log(set2.has(1)); // true
+    console.log(set2.has(2)); // false
+
+    // delete, clear
+    const set3 = new Set([1, 2, 3, 4, 5]);
+    set3.delete(4);
+    console.log(set3.size); // 4
+    set3.clear();
+    console.log(set3.size); // 0
+
+    /*
+        セットの反復処理
+        ・forEach...挿入順に反復する
+        ・values...挿入順に反復する
+        ・keys...キーが存在しないため値の反復処理となる。`values`と結果に変わりはない。
+        ・entries...キーが存在しないため[値, 値]となる   */
+    // forEach
+    const set4 = new Set([1, 2, 3]);
+    const array4 = [];
+    set4.forEach(value => {
+        array4.push(value);
+    });
+    console.log(array4) // [1, 2, 3]
+
+    // values, keys, entries
+    const set5 = new Set([1, 2, 3]);
+    // values
+    const valuesArray = [];
+    for(const value of set5.values()) {
+        valuesArray.push(value);
+    }
+    console.log("valuesArray:", valuesArray) // "valuesArray:" [1, 2, 3]
+    // keys
+    const keysArray = [];
+    for(const value of set5.keys()) {
+        keysArray.push(value);
+    }
+    console.log("keysArray:", keysArray) // "keysArray:" [1, 2, 3]
+    // entries
+    const entriesArray = [];
+    for(const value of set5.entries()) {
+        entriesArray.push(value);
+    }
+    console.log("entriesArray:", entriesArray) // "entriesArray:" [[1, 1], [2, 2], [3, 3]]
+
+    // `Set`オブジェクト自身も iterable なオブジェクトのため、`for...of`が使用できる
+    const set6 = new Set([1, 2, 3]);
+    const setArray = [];
+    for(const value of set6) {
+        setArray.push(value);
+    }
+    console.log("setArray:", setArray) // "setArray:" [1, 2, 3]
